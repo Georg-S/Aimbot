@@ -3,11 +3,20 @@ project(Aimbot)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set (HEADERS
-	""
+	"include/Aimbot.h"
+	"include/MemoryManager.h"
+	"include/FileReader.h"
+	"include/ToggleButton.h"
+	"include/Offsets.h"
 	)
 
 set(SOURCES 
+	"src/Aimbot.cpp"
 	"src/main.cpp"
+	"src/MemoryManager.cpp"
+	"src/FileReader.cpp"
+	"src/ToggleButton.cpp"
+	"src/Offsets.cpp"
 	)
 
 
