@@ -3,6 +3,7 @@
 Aimbot::Aimbot() 
 {
 	mem_manager = MemoryManager();
+	button = ToggleButton();
 }
 
 bool Aimbot::init() 
@@ -28,7 +29,6 @@ bool Aimbot::init()
 
 	client_dll_address = mem_manager.get_module_address(client_dll_name.c_str());
 	return client_dll_address != NULL;
-
 }
 
 bool Aimbot::load_config()
@@ -45,3 +45,25 @@ bool Aimbot::load_config()
 
 	return true;
 }
+
+void Aimbot::run()
+{
+	while (true) 
+	{
+		button.update();
+		if (button.is_on()) 
+		{
+			update_aim_logic();
+		}
+	}
+}
+
+
+void Aimbot::update_aim_logic()
+{
+}
+
+void Aimbot::update_game_data()
+{
+}
+

@@ -11,8 +11,12 @@ public:
 	Aimbot();
 
 	bool init();
+	void run();
+
 private:
 	bool load_config();
+	void update_aim_logic();
+	void update_game_data();
 
 	DWORD client_dll_address;
 	MemoryManager mem_manager;
