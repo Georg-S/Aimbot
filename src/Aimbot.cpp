@@ -14,10 +14,10 @@ bool Aimbot::init()
 		return false;
 	}
 
-	offsets = Offsets::get_instance();
-	if (!offsets) 
+	if (!Offsets::load_offsets_from_file()) 
 	{
 		std::cout << "Loading offsets failed, check offsets file" << std::endl;
+		return false;
 	}
 
 	if (!mem_manager.attach_to_process(windowname.c_str()))
@@ -28,7 +28,8 @@ bool Aimbot::init()
 	}
 
 	client_dll_address = mem_manager.get_module_address(client_dll_name.c_str());
-	return client_dll_address != NULL;
+	engine_address = mem_manager.get_module_address("engine.dll");
+	return client_dll_address != NULL || engine_address != NULL;
 }
 
 bool Aimbot::load_config()
@@ -65,5 +66,30 @@ void Aimbot::update_aim_logic()
 
 void Aimbot::update_game_data()
 {
+	auto player_address = mem_manager.read_memory<DWORD>(client_dll_address + Offsets::local_player_offset);
+	auto player_health = mem_manager.read_memory<DWORD>(player_address + Offsets::player_health_offset);
+	Vec3D<int> player_position = mem_manager.read_memory<Vec3D<int>>(player_address + Offsets::position);
+	Vec2D<float> player_view_vec = mem_manager.read_memory<Vec2D<float>>(player_address + Offsets::position - 3 * sizeof(int));
+}
+
+void Aimbot::debug_print_memory(DWORD address, int rows, int columns)
+{
+	system("CLS");
+	for (int row = 0; row < rows; row++)
+	{
+		for (int column = 0; column < columns; column++) 
+		{
+			int value = mem_manager.read_memory<int>(address);
+			address += sizeof(int);
+			print_4_byte_hex(value);
+			std::cout << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void Aimbot::print_4_byte_hex(DWORD address)
+{
+	printf_s("0x%08x", address);
 }
 

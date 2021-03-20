@@ -8,6 +8,8 @@ set (HEADERS
 	"include/FileReader.h"
 	"include/ToggleButton.h"
 	"include/Offsets.h"
+	"include/Vec3D.h"
+	"include/Vec2D.h"
 	)
 
 set(SOURCES 

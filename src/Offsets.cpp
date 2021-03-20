@@ -1,46 +1,40 @@
 #include "Offsets.h"
 
-std::unique_ptr<Offsets> Offsets::instance = nullptr;
 bool Offsets::initialized_succesful = false;
+DWORD Offsets::local_player_offset;
+DWORD Offsets::crosshair_offset;
+DWORD Offsets::entity_list_start_offset;
+DWORD Offsets::player_health_offset;
+DWORD Offsets::team_offset;
+DWORD Offsets::entity_listelement_size;
+DWORD Offsets::view_angle_offset;
+DWORD Offsets::position;
 
-Offsets* Offsets::get_instance()
+
+bool Offsets::load_offsets_from_file()
 {
-	if (!instance || !initialized_succesful) 
+	try
 	{
-		auto buf = new Offsets();
-		instance = std::unique_ptr<Offsets>(buf);
+		local_player_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "localPlayer"), NULL, HEX);
+		crosshair_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "crosshairOffset"), NULL, HEX);
+		entity_list_start_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "entityBase"), NULL, HEX);
+		player_health_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "PlayerHealth"), NULL, HEX);
+		team_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "teamOffset"), NULL, HEX);
+		entity_listelement_size = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "EntLoopDist"), NULL, HEX);
+		view_angle_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "ViewAngleOffset"), NULL, HEX);
+		position = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "position"), NULL, HEX);
 	}
-
-	if (initialized_succesful)
-		return instance.get();
-
-	return nullptr;
-}
-
-Offsets::Offsets() 
-{
-	try 
+	catch (std::exception const& e)
 	{
-		initialized_succesful = load_offsets();
+		return false;
 	}
-	catch (const std::exception& e)
-	{
-		initialized_succesful = false;
-	}
-}
-
-bool Offsets::load_offsets()
-{
-	local_player_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "localPlayer"), NULL, HEX);
-	crosshair_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "crosshairOffset"), NULL, HEX);
-	entity_list_start_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "entityBase"), NULL, HEX);
-	player_health_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "PlayerHealth"), NULL, HEX);
-	team_offset = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "teamOffset"), NULL, HEX);
-	entity_listelement_size = stol(FileReader::read_value_of_string_in_file("memoryOffsets.txt", "EntLoopDist"), NULL, HEX);
 
 	if (local_player_offset == 0 || crosshair_offset == 0 ||
-		player_health_offset == 0 || team_offset == 0 || entity_listelement_size == 0)
+		player_health_offset == 0 || team_offset == 0 || entity_listelement_size == 0) 
+	{
+		std::cout << "In the offsets file one or more values are 0" << std::endl;
 		return false;
+	}
 
 	return true;
 }

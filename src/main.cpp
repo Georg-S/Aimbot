@@ -7,7 +7,7 @@ int main()
     Aimbot aimbot = Aimbot();
 
     if (aimbot.init())
-        std::cout << "Init sucessful" << std::endl;
+        aimbot.run();
 
     return 0;
 }

@@ -40,7 +40,7 @@ DWORD MemoryManager::get_module_address(const char* module_name)
 			TCHAR name[MAX_PATH];
 			GetModuleBaseName(process, modules[i], name, sizeof(name));
 
-			if (!_tcscmp(name, "client.dll"))
+			if (!_tcscmp(name, module_name))
 			{
 				std::cout << module_name << " found address: ";
 				print_4_byte_hex((DWORD)modules[i]);
