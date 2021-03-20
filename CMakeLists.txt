@@ -16,9 +16,6 @@ target_include_directories(Aimbot PUBLIC "include")
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Aimbot)
 set_property(TARGET Aimbot PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-set(NEAT_LIB_PATH ${CMAKE_CURRENT_BINARY_DIR}"/"$<CONFIG>"/NeuroEvolution.lib")
-
-
 add_custom_command(TARGET Aimbot 
                    POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy 
