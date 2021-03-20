@@ -1,0 +1,9 @@
+localPlayer = "0xD8B2DC"		//Hazedumper: dwLocalPlayer
+crosshairOffset = "0xB3E4"		//Hazedumper: m_iCrosshairId
+entityBase = "0x4DA2F24"		//Hazedumper: dwEntityList	
+	
+
+// Doesn't need to be updated often
+PlayerHealth = "0x100"			//Hazedumper: m_iHealth 
+teamOffset = "0xF4"			//Hazedumper: m_iTeamNum
+EntLoopDist = "0x10"
