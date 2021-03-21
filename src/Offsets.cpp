@@ -41,6 +41,5 @@ bool Offsets::load_offsets_from_file()
 		std::cout << "In the offsets file one or more values are 0" << std::endl;
 		return false;
 	}
-	std::cout << clientState << std::endl;
 	return true;
 }

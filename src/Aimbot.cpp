@@ -106,7 +106,6 @@ void Aimbot::update_other_players(DWORD player_address, DWORD engine_client_stat
 		ent.team = mem_manager.read_memory<int>(entity_address + Offsets::team_offset);
 		other_players.push_back(ent);
 	}
-	std::cout << other_players.size() << std::endl;
 }
 
 void Aimbot::debug_print_memory(DWORD address, int rows, int columns)
@@ -132,12 +131,13 @@ void Aimbot::print_4_byte_hex(DWORD address)
 
 Vec3D<float> Aimbot::get_head_bone(DWORD entity)
 {
+	//Bone matrix is a 3 row 4 column matrix  3 * 4 * 4 = hex 30
 	constexpr DWORD head_bone_index = 0x8;
 	constexpr DWORD matrix_size = 0x30;
 	Vec3D<float> pos;
 
 	DWORD bones_address = mem_manager.read_memory<DWORD>(entity + Offsets::bone_matrix);
-	pos.x = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x0C);
+	pos.x = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x0C); //0C,1c,2c because we want the right column of the matrix
 	pos.y = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x1C);
 	pos.z = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x2C);
 
