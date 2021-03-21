@@ -76,7 +76,9 @@ void Aimbot::update_game_data()
 
 	update_controlled_player(player_address, engine_client_state);
 	update_other_players(player_address, engine_client_state);
-	//	mem_manager.write_memory<float>(engine_client_state + 0x4D90, 12.f);
+	Vec3D<float> closest_enemy_head_bone = get_closest_enemy_head_bone();
+	Vec2D<float> new_view_vec = calc_vec_aim_to_head(closest_enemy_head_bone);
+	set_view_vec(engine_client_state, new_view_vec);
 }
 
 void Aimbot::update_controlled_player(DWORD player_address, DWORD engine_client_state_address)
@@ -142,5 +144,34 @@ Vec3D<float> Aimbot::get_head_bone(DWORD entity)
 	pos.z = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x2C);
 
 	return pos;
+}
+
+Vec3D<float> Aimbot::get_closest_enemy_head_bone()
+{
+	Vec3D<float> closest_vec;
+	float closest_distance = FLT_MAX;
+	for (int i = 0; i < this->other_players.size(); i++) 
+	{
+		Vec3D<float> buf = this->player_head_bone - other_players[i].head_bone_pos;
+		float distance = buf.calc_abs();
+
+		if (distance <= closest_distance) 
+		{
+			closest_distance = distance;
+			closest_vec = other_players[i].head_bone_pos;
+		}
+	}
+
+	return closest_vec;
+}
+
+Vec2D<float> Aimbot::calc_vec_aim_to_head(const Vec3D<float>& enemy_head)
+{
+	return Vec2D<float>();
+}
+
+void Aimbot::set_view_vec(DWORD engine_client_state_address, const Vec2D<float>& vec)
+{
+	mem_manager.write_memory<Vec2D<float>>(engine_client_state_address + Offsets::client_state_view_angle, vec);
 }
 

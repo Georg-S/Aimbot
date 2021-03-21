@@ -26,6 +26,9 @@ private:
 	void debug_print_memory(DWORD address, int rows, int columns);
 	void print_4_byte_hex(DWORD address);
 	Vec3D<float> get_head_bone(DWORD entity);
+	Vec3D<float> get_closest_enemy_head_bone();
+	Vec2D<float> calc_vec_aim_to_head(const Vec3D<float>& enemy_head);
+	void set_view_vec(DWORD engine_client_state_address, const Vec2D<float>& vec);
 
 	DWORD client_dll_address;
 	DWORD engine_address;

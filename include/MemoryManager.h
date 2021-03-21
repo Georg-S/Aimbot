@@ -27,7 +27,7 @@ public:
 	}
 
 	template <typename type>
-	bool write_memory(DWORD address, type data)
+	bool write_memory(DWORD address, const type& data)
 	{
 		if (!WriteProcessMemory(this->process, (LPVOID)address, &data, sizeof(data), NULL) && debug_print) 
 		{
