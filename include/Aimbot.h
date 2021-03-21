@@ -1,6 +1,8 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include "Vec3D.h"
 #include "MemoryManager.h"
 #include "FileReader.h"

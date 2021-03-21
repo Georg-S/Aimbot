@@ -66,7 +66,12 @@ void Aimbot::run()
 
 void Aimbot::update_aim_logic()
 {
+	DWORD engine_client_state = mem_manager.read_memory<DWORD>(engine_address + Offsets::clientState);
+
 	update_game_data();
+	Vec3D<float> closest_enemy_head_bone = get_closest_enemy_head_bone();
+	Vec2D<float> new_view_vec = calc_vec_aim_to_head(closest_enemy_head_bone);
+	set_view_vec(engine_client_state, new_view_vec);
 }
 
 void Aimbot::update_game_data()
@@ -76,9 +81,6 @@ void Aimbot::update_game_data()
 
 	update_controlled_player(player_address, engine_client_state);
 	update_other_players(player_address, engine_client_state);
-	Vec3D<float> closest_enemy_head_bone = get_closest_enemy_head_bone();
-	Vec2D<float> new_view_vec = calc_vec_aim_to_head(closest_enemy_head_bone);
-	set_view_vec(engine_client_state, new_view_vec);
 }
 
 void Aimbot::update_controlled_player(DWORD player_address, DWORD engine_client_state_address)
@@ -150,15 +152,15 @@ Vec3D<float> Aimbot::get_closest_enemy_head_bone()
 {
 	Vec3D<float> closest_vec;
 	float closest_distance = FLT_MAX;
-	for (int i = 0; i < this->other_players.size(); i++) 
+	for(const auto& enemy : other_players)
 	{
-		Vec3D<float> buf = this->player_head_bone - other_players[i].head_bone_pos;
+		Vec3D<float> buf = this->player_head_bone - enemy.head_bone_pos;
 		float distance = buf.calc_abs();
 
-		if (distance <= closest_distance) 
+		if (distance <= closest_distance && enemy.team != this->player_team && enemy.health > 0) 
 		{
 			closest_distance = distance;
-			closest_vec = other_players[i].head_bone_pos;
+			closest_vec = enemy.head_bone_pos;
 		}
 	}
 
@@ -167,7 +169,47 @@ Vec3D<float> Aimbot::get_closest_enemy_head_bone()
 
 Vec2D<float> Aimbot::calc_vec_aim_to_head(const Vec3D<float>& enemy_head)
 {
-	return Vec2D<float>();
+	Vec2D<float> result;
+	Vec3D<float> buf = enemy_head - this->player_head_bone;
+	buf.normalize();
+
+	Vec3D<float> z_vec;
+	z_vec.x = 0;
+	z_vec.y = 0;
+	z_vec.z = 1;
+
+	float cos = z_vec.dot_product(buf) / (z_vec.calc_abs() * buf.calc_abs());
+	float angle = acos(cos) / M_PI * 180;
+	angle -= 90;
+
+
+
+	Vec3D<float> x_vec;
+	x_vec.x = 1;
+	x_vec.y = 0;
+	x_vec.z = 0;
+
+	auto sign = 1;
+	auto cos2 = x_vec.dot_product(buf) / (x_vec.calc_abs() * buf.calc_abs());
+	if (cos2 < 0)
+		sign = -1;
+
+	auto test_sin = sqrt(1 - cos2 * cos2);
+
+	auto angle2 = acos(cos2) / M_PI * 180;
+	angle2 *= sign;
+
+
+	buf.z = 0;
+
+	std::cout << atan2(buf.y, buf.x) / M_PI * 180 << std::endl;
+	std::cout << player_view_vec.y << std::endl;
+
+//	std::cout << test_sin << std::endl;
+
+	result.x = angle;
+	result.y = atan2(buf.y, buf.x) / M_PI * 180;
+	return result;
 }
 
 void Aimbot::set_view_vec(DWORD engine_client_state_address, const Vec2D<float>& vec)

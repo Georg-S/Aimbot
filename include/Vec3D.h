@@ -5,6 +5,14 @@ template <typename T>
 class Vec3D
 {
 public:
+	Vec3D() 
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+
+
 	T calc_abs() const
 	{
 		return sqrt(x * x + y * y + z * z);
@@ -13,6 +21,19 @@ public:
 	void print() const
 	{
 		std::cout << "X: " << x << " Y: " << y << " Z: " << z << std::endl;
+	}
+
+	void normalize() 
+	{
+		T length = calc_abs();
+		x /= length;
+		y /= length;
+		z /= length;
+	}
+
+	T dot_product(const Vec3D<T> other) 
+	{	
+		return x * other.x + y * other.y + z * other.z;
 	}
 
 	T x;
@@ -38,6 +59,28 @@ Vec3D<T> operator-(const Vec3D<T>& left, const Vec3D<T>& right)
 	result.x = left.x - right.x;
 	result.y = left.y - right.y;
 	result.z = left.z - right.z;
+
+	return result;
+}
+
+template <typename T>
+Vec3D<T> operator/(const Vec3D<T>& left, T num)
+{
+	Vec3D<T> result;
+	result.x /= num;
+	result.y /= num;
+	result.z /= num;
+
+	return result;
+}
+
+template <typename T>
+Vec3D<T> operator*(const Vec3D<T>& left, T num)
+{
+	Vec3D<T> result;
+	result.x *= num;
+	result.y *= num;
+	result.z *= num;
 
 	return result;
 }
