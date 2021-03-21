@@ -170,45 +170,16 @@ Vec3D<float> Aimbot::get_closest_enemy_head_bone()
 Vec2D<float> Aimbot::calc_vec_aim_to_head(const Vec3D<float>& enemy_head)
 {
 	Vec2D<float> result;
-	Vec3D<float> buf = enemy_head - this->player_head_bone;
-	buf.normalize();
+	Vec3D<float> vec_to_enemy = enemy_head - this->player_head_bone;
+	Vec3D<float> z_vec{0,0,1};
 
-	Vec3D<float> z_vec;
-	z_vec.x = 0;
-	z_vec.y = 0;
-	z_vec.z = 1;
+	float cos = z_vec.dot_product(vec_to_enemy) / (z_vec.calc_abs() * vec_to_enemy.calc_abs());
+	float vertical_angle = acos(cos) / M_PI * 180;
+	vertical_angle -= 90;
 
-	float cos = z_vec.dot_product(buf) / (z_vec.calc_abs() * buf.calc_abs());
-	float angle = acos(cos) / M_PI * 180;
-	angle -= 90;
+	result.x = vertical_angle;
+	result.y = atan2(vec_to_enemy.y, vec_to_enemy.x) / M_PI * 180;
 
-
-
-	Vec3D<float> x_vec;
-	x_vec.x = 1;
-	x_vec.y = 0;
-	x_vec.z = 0;
-
-	auto sign = 1;
-	auto cos2 = x_vec.dot_product(buf) / (x_vec.calc_abs() * buf.calc_abs());
-	if (cos2 < 0)
-		sign = -1;
-
-	auto test_sin = sqrt(1 - cos2 * cos2);
-
-	auto angle2 = acos(cos2) / M_PI * 180;
-	angle2 *= sign;
-
-
-	buf.z = 0;
-
-	std::cout << atan2(buf.y, buf.x) / M_PI * 180 << std::endl;
-	std::cout << player_view_vec.y << std::endl;
-
-//	std::cout << test_sin << std::endl;
-
-	result.x = angle;
-	result.y = atan2(buf.y, buf.x) / M_PI * 180;
 	return result;
 }
 
