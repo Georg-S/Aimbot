@@ -20,29 +20,33 @@ bool Aimbot::init()
 		return false;
 	}
 
-	if (!mem_manager.attach_to_process(windowname.c_str()))
+	if (!mem_manager.attach_to_process(config.windowname.c_str()))
 	{
 		std::cout << "Couldn't find process: Quiting " << std::endl;
 		std::cout << "Make Sure CS-GO is open " << std::endl;
 		return false;
 	}
 
-	client_dll_address = mem_manager.get_module_address(client_dll_name.c_str());
-	engine_address = mem_manager.get_module_address("engine.dll");
+	client_dll_address = mem_manager.get_module_address(config.client_dll_name.c_str());
+	engine_address = mem_manager.get_module_address(config.engine_dll_name.c_str());
 	return client_dll_address != NULL || engine_address != NULL;
 }
 
 bool Aimbot::load_config()
 {
-	windowname = FileReader::read_value_of_string_in_file("config.txt", "windowName");
-	client_dll_name = FileReader::read_value_of_string_in_file("config.txt", "client Dll Name");
-	delay = stol(FileReader::read_value_of_string_in_file("config.txt", "delay"), NULL, DEC);
-	unsigned int trigger_button = stol(FileReader::read_value_of_string_in_file("config.txt", "triggerButton"), NULL, HEX);
+	static constexpr int DEC = 10;
+	static constexpr int HEX = 16;
+	
+	config.windowname = FileReader::read_value_of_string_in_file("config.txt", "windowName");
+	config.client_dll_name = FileReader::read_value_of_string_in_file("config.txt", "client Dll Name");
+	config.engine_dll_name = FileReader::read_value_of_string_in_file("config.txt", "engine Dll Name");
+	config.delay = stol(FileReader::read_value_of_string_in_file("config.txt", "delay"), NULL, DEC);
+	config.trigger_button = stol(FileReader::read_value_of_string_in_file("config.txt", "triggerButton"), NULL, HEX);
 
-	if (windowname == "" || client_dll_name == "" || trigger_button == 0)
+	if (config.windowname == "" || config.client_dll_name == "" || config.trigger_button == 0)
 		return false;
 
-	button.set_toggle_button(trigger_button);
+	button.set_toggle_button(config.trigger_button);
 
 	return true;
 }
@@ -62,14 +66,47 @@ void Aimbot::run()
 
 void Aimbot::update_aim_logic()
 {
+	update_game_data();
 }
 
 void Aimbot::update_game_data()
 {
-	auto player_address = mem_manager.read_memory<DWORD>(client_dll_address + Offsets::local_player_offset);
-	auto player_health = mem_manager.read_memory<DWORD>(player_address + Offsets::player_health_offset);
-	Vec3D<int> player_position = mem_manager.read_memory<Vec3D<int>>(player_address + Offsets::position);
-	Vec2D<float> player_view_vec = mem_manager.read_memory<Vec2D<float>>(player_address + Offsets::position - 3 * sizeof(int));
+	DWORD player_address = mem_manager.read_memory<DWORD>(client_dll_address + Offsets::local_player_offset);
+	DWORD engine_client_state = mem_manager.read_memory<DWORD>(engine_address + Offsets::clientState);
+
+	update_controlled_player(player_address, engine_client_state);
+	update_other_players(player_address, engine_client_state);
+	//	mem_manager.write_memory<float>(engine_client_state + 0x4D90, 12.f);
+}
+
+void Aimbot::update_controlled_player(DWORD player_address, DWORD engine_client_state_address)
+{
+	this->player_view_vec = mem_manager.read_memory<Vec2D<float>>(engine_client_state_address + Offsets::client_state_view_angle);
+	this->player_health = mem_manager.read_memory<int>(player_address + Offsets::player_health_offset);
+	this->player_team = mem_manager.read_memory<int>(player_address + Offsets::team_offset);
+	this->player_head_bone = get_head_bone(player_address);
+}
+
+void Aimbot::update_other_players(DWORD player_address, DWORD engine_client_state_address)
+{
+	int max_players = mem_manager.read_memory<int>(engine_client_state_address + Offsets::client_state_max_players);
+
+	other_players.clear();
+	for (int i = 0; i < max_players; i++) 
+	{
+		DWORD entity_address = mem_manager.read_memory<DWORD>(client_dll_address + Offsets::entity_list_start_offset 
+			+ Offsets::entity_listelement_size * i);
+
+		if (!entity_address || entity_address == player_address)
+			continue;
+
+		Entity ent;
+		ent.head_bone_pos = get_head_bone(entity_address);
+		ent.health = mem_manager.read_memory<DWORD>(entity_address + Offsets::player_health_offset);
+		ent.team = mem_manager.read_memory<int>(entity_address + Offsets::team_offset);
+		other_players.push_back(ent);
+	}
+	std::cout << other_players.size() << std::endl;
 }
 
 void Aimbot::debug_print_memory(DWORD address, int rows, int columns)
@@ -79,7 +116,7 @@ void Aimbot::debug_print_memory(DWORD address, int rows, int columns)
 	{
 		for (int column = 0; column < columns; column++) 
 		{
-			int value = mem_manager.read_memory<int>(address);
+			DWORD value = mem_manager.read_memory<int>(address);
 			address += sizeof(int);
 			print_4_byte_hex(value);
 			std::cout << " ";
@@ -91,5 +128,19 @@ void Aimbot::debug_print_memory(DWORD address, int rows, int columns)
 void Aimbot::print_4_byte_hex(DWORD address)
 {
 	printf_s("0x%08x", address);
+}
+
+Vec3D<float> Aimbot::get_head_bone(DWORD entity)
+{
+	constexpr DWORD head_bone_index = 0x8;
+	constexpr DWORD matrix_size = 0x30;
+	Vec3D<float> pos;
+
+	DWORD bones_address = mem_manager.read_memory<DWORD>(entity + Offsets::bone_matrix);
+	pos.x = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x0C);
+	pos.y = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x1C);
+	pos.z = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x2C);
+
+	return pos;
 }
 

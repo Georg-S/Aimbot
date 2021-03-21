@@ -1,11 +1,18 @@
-localPlayer = "0xD8C2CC"		//Hazedumper: dwLocalPlayer
-crosshairOffset = "0xB3E4"		//Hazedumper: m_iCrosshairId
-entityBase = "0x4DA3FA4"		//Hazedumper: dwEntityList	
-	
 
+//Client Dll Offsets
 // Doesn't need to be updated often
-PlayerHealth = "0x100"			//Hazedumper: m_iHealth 
-teamOffset = "0xF4"				//Hazedumper: m_iTeamNum
-ViewAngleOffset = "0x108"		//Hazedumper: m_vecViewOffset 
-position = "0x138"				//m_vecOrigin
+PlayerHealth = "0x100"				//Hazedumper: m_iHealth 
+teamOffset = "0xF4"					//Hazedumper: m_iTeamNum		
+position = "0x138"					//m_vecOrigin
 EntLoopDist = "0x10"		
+
+//Need to be updated more frequently
+localPlayer = "0xD8C2CC"			//Hazedumper: dwLocalPlayer
+crosshairOffset = "0xB3E4"			//Hazedumper: m_iCrosshairId
+entityBase = "0x4DA3FA4"			//Hazedumper: dwEntityList	
+boneMatrix = "0x26A8"				//Hazedumper: m_dwBoneMatrix 
+
+//Engine Dll Offsets
+clientStateBase = "0x58EFE4"		//Hazedumper: dwClientState 
+clientStateViewAngle = "0x4D90"		//dwClientState_ViewAngles
+clientStateMaxPlayer = "0x388"		//dwClientState_MaxPlayer

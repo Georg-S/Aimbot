@@ -10,6 +10,8 @@ set (HEADERS
 	"include/Offsets.h"
 	"include/Vec3D.h"
 	"include/Vec2D.h"
+	"include/Entity.h"
+	"include/ConfigData.h"
 	)
 
 set(SOURCES 

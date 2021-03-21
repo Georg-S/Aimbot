@@ -8,7 +8,7 @@
 #include <string>
 #include <iomanip>
 
-class MemoryManager 
+class MemoryManager
 {
 public:
 	MemoryManager();
@@ -24,6 +24,17 @@ public:
 		if (!ReadProcessMemory(process, (LPVOID)address, &result, sizeof(type), NULL) && debug_print)
 			std::cout << "Error Reading Memory Error Code: " << GetLastError() << std::endl;
 		return result;
+	}
+
+	template <typename type>
+	bool write_memory(DWORD address, type data)
+	{
+		if (!WriteProcessMemory(this->process, (LPVOID)address, &data, sizeof(data), NULL) && debug_print) 
+		{
+			std::cout << "Error writing to memory Error Code: " << GetLastError() << std::endl;
+			return false;
+		}
+		return true;
 	}
 
 private:

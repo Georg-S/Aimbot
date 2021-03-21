@@ -1,11 +1,14 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include "Vec3D.h"
 #include "MemoryManager.h"
 #include "FileReader.h"
 #include "ToggleButton.h"
 #include "Offsets.h"
 #include "Vec2D.h"
+#include "ConfigData.h"
+#include "Entity.h"
 
 class Aimbot 
 {
@@ -18,19 +21,22 @@ private:
 	bool load_config();
 	void update_aim_logic();
 	void update_game_data();
+	void update_controlled_player(DWORD player_address, DWORD engine_client_state_address);
+	void update_other_players(DWORD player_address, DWORD engine_client_state_address);
 	void debug_print_memory(DWORD address, int rows, int columns);
 	void print_4_byte_hex(DWORD address);
+	Vec3D<float> get_head_bone(DWORD entity);
 
 	DWORD client_dll_address;
 	DWORD engine_address;
 	MemoryManager mem_manager;
-	static constexpr int DEC = 10;
-	static constexpr int HEX = 16;
-
-	//Will be read from the Config file
-	std::string client_dll_name;
-	std::string  windowname;
-	int delay = 0;
 	ToggleButton button;
 	Offsets* offsets;
+	ConfigData config;
+
+	Vec3D<float> player_head_bone;
+	Vec2D<float> player_view_vec;
+	int player_health;
+	int player_team;
+	std::vector<Entity> other_players;
 };
