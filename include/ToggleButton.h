@@ -10,6 +10,7 @@ public:
 	void update();
 	void set_toggle_button(int button);
 	bool is_on() const;
+
 private:
 	int button = 0;
 	bool triggered = false;
