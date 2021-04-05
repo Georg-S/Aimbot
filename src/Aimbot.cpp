@@ -3,7 +3,7 @@
 Aimbot::Aimbot() 
 {
 	mem_manager = MemoryManager();
-	button = ToggleButton();
+	button = ToggleButton("Aimbot");
 }
 
 bool Aimbot::init() 
@@ -70,7 +70,7 @@ void Aimbot::update_aim_logic()
 
 	update_game_data();
 	Vec3D<float> closest_enemy_head_bone = get_closest_enemy_head_bone();
-	Vec2D<float> new_view_vec = calc_vec_aim_to_head(closest_enemy_head_bone);
+	Vec2D<float> new_view_vec = calc_view_vec_aim_to_head(closest_enemy_head_bone);
 	set_view_vec(engine_client_state, new_view_vec);
 }
 
@@ -141,7 +141,8 @@ Vec3D<float> Aimbot::get_head_bone(DWORD entity)
 	Vec3D<float> pos;
 
 	DWORD bones_address = mem_manager.read_memory<DWORD>(entity + Offsets::bone_matrix);
-	pos.x = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x0C); //0C,1c,2c because we want the right column of the matrix
+	//0C,1c,2c because we want the right column of the matrix
+	pos.x = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x0C); 
 	pos.y = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x1C);
 	pos.z = mem_manager.read_memory<float>(bones_address + matrix_size * head_bone_index + 0x2C);
 
@@ -167,11 +168,11 @@ Vec3D<float> Aimbot::get_closest_enemy_head_bone()
 	return closest_vec;
 }
 
-Vec2D<float> Aimbot::calc_vec_aim_to_head(const Vec3D<float>& enemy_head)
+Vec2D<float> Aimbot::calc_view_vec_aim_to_head(const Vec3D<float>& enemy_head)
 {
 	Vec2D<float> result;
 	Vec3D<float> vec_to_enemy = enemy_head - this->player_head_bone;
-	Vec3D<float> z_vec{0,0,1};
+	const Vec3D<float> z_vec{0,0,1};
 
 	float cos = z_vec.dot_product(vec_to_enemy) / (z_vec.calc_abs() * vec_to_enemy.calc_abs());
 	float vertical_angle = acos(cos) / M_PI * 180;

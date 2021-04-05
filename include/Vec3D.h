@@ -27,7 +27,7 @@ public:
 		z /= length;
 	}
 
-	T dot_product(const Vec3D<T> other) 
+	T dot_product(const Vec3D<T> other) const
 	{	
 		return x * other.x + y * other.y + z * other.z;
 	}

@@ -9,7 +9,7 @@ EntLoopDist = "0x10"
 //Need to be updated more frequently
 localPlayer = "0xD8C2CC"			//Hazedumper: dwLocalPlayer
 crosshairOffset = "0xB3E4"			//Hazedumper: m_iCrosshairId
-entityBase = "0x4DA3FA4"			//Hazedumper: dwEntityList	
+entityBase = "0x4DA3F44"			//Hazedumper: dwEntityList	
 boneMatrix = "0x26A8"				//Hazedumper: m_dwBoneMatrix 
 
 //Engine Dll Offsets

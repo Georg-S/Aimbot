@@ -29,7 +29,7 @@ private:
 	void print_4_byte_hex(DWORD address);
 	Vec3D<float> get_head_bone(DWORD entity);
 	Vec3D<float> get_closest_enemy_head_bone();
-	Vec2D<float> calc_vec_aim_to_head(const Vec3D<float>& enemy_head);
+	Vec2D<float> calc_view_vec_aim_to_head(const Vec3D<float>& enemy_head);
 	void set_view_vec(DWORD engine_client_state_address, const Vec2D<float>& vec);
 
 	DWORD client_dll_address;
@@ -38,7 +38,6 @@ private:
 	ToggleButton button;
 	Offsets* offsets;
 	ConfigData config;
-
 	Vec3D<float> player_head_bone;
 	Vec2D<float> player_view_vec;
 	int player_health;

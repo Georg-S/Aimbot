@@ -1,7 +1,8 @@
 #include "ToggleButton.h"
 
-ToggleButton::ToggleButton(int button)
+ToggleButton::ToggleButton(const std::string& button_name, int button)
 {
+	this->button_name = button_name;
 	this->button = button;
 }
 
@@ -17,9 +18,9 @@ void ToggleButton::update()
 		if (print_when_toggled) 
 		{
 			if (triggered)
-				std::cout << "Triggerbot toggled  ON" << std::endl;
+				std::cout << this->button_name <<" toggled  ON" << std::endl;
 			else
-				std::cout << "Triggerbot toggled  OFF" << std::endl;
+				std::cout << this->button_name << " toggled  OFF" << std::endl;
 		}
 	}
 	if (buff == 0)
