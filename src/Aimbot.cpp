@@ -29,7 +29,8 @@ bool Aimbot::init()
 
 	client_dll_address = mem_manager.get_module_address(config.client_dll_name.c_str());
 	engine_address = mem_manager.get_module_address(config.engine_dll_name.c_str());
-	return client_dll_address != NULL || engine_address != NULL;
+
+	return (client_dll_address != NULL) && (engine_address != NULL);
 }
 
 bool Aimbot::load_config()
